@@ -1,0 +1,16 @@
+{
+  "name": "Pharmacies CI",
+  "short_name": "Pharmacies CI",
+  "description": "Trouvez les pharmacies de garde en Côte d'Ivoire",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2E9B2E",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
