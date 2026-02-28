@@ -98,7 +98,7 @@ export default function GardeDetail() {
               </div>
             )}
 
-            <div className="rounded-2xl bg-card border border-primary/20 shadow-sm p-5 mb-6">
+            <div className="rounded-2xl bg-card border border-primary/20 shadow-sm p-5 mb-4">
               <h2 className="font-bold text-lg text-foreground mb-4">
                 PHCIE {pharmacie.name}
               </h2>
@@ -113,7 +113,7 @@ export default function GardeDetail() {
                   {pharmacie.section ?? ""} {pharmacie.area ?? pharmacie.city}
                 </p>
               )}
-              {pharmacie.phones && pharmacie.phones.length > 0 && (
+              {pharmacie.phones && pharmacie.phones.length > 0 && pharmacie.phones.length <= 2 && (
                 <div className="mt-3 space-y-2">
                   <p className="text-muted-foreground text-xs font-medium">Téléphone(s)</p>
                   {pharmacie.phones.map((num) => (
@@ -133,6 +133,30 @@ export default function GardeDetail() {
                 </div>
               )}
             </div>
+
+            {pharmacie.phones && pharmacie.phones.length > 2 && (
+              <div className="rounded-2xl bg-muted/40 border border-border/60 shadow-sm p-5 mb-6">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide mb-3">
+                  Téléphone(s)
+                </p>
+                <div className="space-y-2">
+                  {pharmacie.phones.map((num) => (
+                    <div key={num} className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-primary font-medium text-sm">+225 {num}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1 border-primary/40 text-primary shrink-0"
+                        onClick={() => openTel(num)}
+                      >
+                        <Phone size={14} />
+                        Appeler
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-2 mb-8">
               <Button

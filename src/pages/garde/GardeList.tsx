@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, MapPin, Phone, Share2 } from "lucide-react";
+import { ArrowLeft, Search, MapPin, ChevronRight, Share2 } from "lucide-react";
 import {
   getGardeAbidjan,
   getGardeInterieur,
@@ -22,8 +22,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-function getWeekRange(weekOffset: number, customDate: string | null): { start: string; end: string } {
-  const base = customDate ? new Date(customDate) : addWeeks(new Date(), weekOffset);
+function getWeekRange(weekOffset: number): { start: string; end: string } {
+  const base = addWeeks(new Date(), weekOffset);
   const start = startOfWeek(base, { weekStartsOn: 1 });
   const end = endOfWeek(base, { weekStartsOn: 1 });
   return {
@@ -53,10 +53,9 @@ function GardeListContent() {
   const [section, setSection] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
   const [weekOffset, setWeekOffset] = useState(0);
-  const [customDate, setCustomDate] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("name");
 
-  const { start: startDateStr, end: endDateStr } = getWeekRange(weekOffset, customDate);
+  const { start: startDateStr, end: endDateStr } = getWeekRange(weekOffset);
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["garde", isAbidjan ? "abidjan" : "interieur", startDateStr, endDateStr, section ?? city],
@@ -99,11 +98,6 @@ function GardeListContent() {
     });
     return sorted;
   }, [list, search, sortBy]);
-
-  const openTel = (raw: string) => {
-    const tel = raw.replace(/\s/g, "");
-    if (tel) window.open(`tel:${tel}`, "_self");
-  };
 
   const handleYAller = (p: PharmacieDeGarde) => {
     const query = [p.name, p.address, p.area ?? p.city].filter(Boolean).join(", ");
@@ -192,31 +186,18 @@ function GardeListContent() {
           <div className="flex flex-wrap items-center gap-2 mt-3">
             <button
               type="button"
-              onClick={() => { setWeekOffset(0); setCustomDate(null); }}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 0 && !customDate ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
+              onClick={() => setWeekOffset(0)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 0 ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
             >
               Cette semaine
             </button>
             <button
               type="button"
-              onClick={() => { setWeekOffset(1); setCustomDate(null); }}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 1 && !customDate ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
+              onClick={() => setWeekOffset(1)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 1 ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
             >
               Semaine prochaine
             </button>
-            <label className="flex items-center gap-1.5 text-primary-foreground/90 text-xs">
-              <span>Ou</span>
-              <input
-                type="date"
-                value={customDate ?? ""}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setCustomDate(v || null);
-                  if (v) setWeekOffset(0);
-                }}
-                className="rounded px-2 py-1 bg-primary-foreground/20 text-primary-foreground text-xs border-0 focus:ring-2 focus:ring-primary-foreground/50"
-              />
-            </label>
           </div>
         </div>
 
@@ -280,22 +261,6 @@ function GardeListContent() {
                       {p.address}
                     </p>
                   )}
-                  {p.phones && p.phones.length > 0 && (
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      {p.phones.map((num) => (
-                        <span key={num} className="inline-flex items-center gap-1 rounded-md bg-muted/80 px-2 py-1 text-xs">
-                          <span className="text-muted-foreground">+225 {num}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); openTel(num); }}
-                            className="text-primary font-medium hover:underline"
-                          >
-                            Appeler
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
                 <div className="grid grid-cols-3 gap-2 px-4 pb-4">
                   <Button
@@ -303,11 +268,11 @@ function GardeListContent() {
                     className="min-w-0 gap-1 bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      openTel(p.phones?.[0] ?? "");
+                      p.pharmacy_id && navigate(`/garde/pharmacie/${p.pharmacy_id}`);
                     }}
                   >
-                    <Phone size={16} className="shrink-0" />
-                    <span className="truncate">Appeler</span>
+                    <ChevronRight size={16} className="shrink-0" />
+                    <span className="truncate">Détails</span>
                   </Button>
                   <Button
                     size="sm"
