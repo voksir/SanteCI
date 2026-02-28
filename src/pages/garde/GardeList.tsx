@@ -9,7 +9,7 @@ import {
   getVillesInterieur,
 } from "@/services/gardeApi";
 import type { PharmacieDeGarde } from "@/types/garde";
-import { startOfWeek, endOfWeek, format } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
 import {
@@ -22,10 +22,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
-const startDateStr = format(weekStart, "yyyy-MM-dd");
-const endDateStr = format(weekEnd, "yyyy-MM-dd");
+function getWeekRange(weekOffset: number, customDate: string | null): { start: string; end: string } {
+  const base = customDate ? new Date(customDate) : addWeeks(new Date(), weekOffset);
+  const start = startOfWeek(base, { weekStartsOn: 1 });
+  const end = endOfWeek(base, { weekStartsOn: 1 });
+  return {
+    start: format(start, "yyyy-MM-dd"),
+    end: format(end, "yyyy-MM-dd"),
+  };
+}
 
 function formatDateRange(start: string, end: string) {
   return `${format(new Date(start), "d MMM", { locale: fr })} – ${format(new Date(end), "d MMM yyyy", { locale: fr })}`;
@@ -37,6 +42,8 @@ function displayPharmacyName(name: string) {
   return name ? `${PHCIE_PREFIX}${name}` : PHCIE_PREFIX.trim();
 }
 
+type SortOption = "name" | "section" | "city";
+
 function GardeListContent() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,6 +52,11 @@ function GardeListContent() {
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [customDate, setCustomDate] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("name");
+
+  const { start: startDateStr, end: endDateStr } = getWeekRange(weekOffset, customDate);
 
   const { data: list = [], isLoading, error } = useQuery({
     queryKey: ["garde", isAbidjan ? "abidjan" : "interieur", startDateStr, endDateStr, section ?? city],
@@ -67,13 +79,29 @@ function GardeListContent() {
   });
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return list;
-    const q = search.trim().toLowerCase();
-    return list.filter((p) => p.name.toLowerCase().includes(q));
-  }, [list, search]);
+    let result = list;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.address?.toLowerCase().includes(q)) ||
+          (p.section?.toLowerCase().includes(q)) ||
+          (p.area?.toLowerCase().includes(q)) ||
+          (p.city?.toLowerCase().includes(q))
+      );
+    }
+    const sorted = [...result].sort((a, b) => {
+      if (sortBy === "name") return (a.name ?? "").localeCompare(b.name ?? "");
+      if (sortBy === "section") return (a.section ?? "").localeCompare(b.section ?? "");
+      if (sortBy === "city") return (a.city ?? "").localeCompare(b.city ?? "");
+      return 0;
+    });
+    return sorted;
+  }, [list, search, sortBy]);
 
-  const handleAppeler = (p: PharmacieDeGarde) => {
-    const tel = p.phones?.[0]?.replace(/\s/g, "") ?? "";
+  const openTel = (raw: string) => {
+    const tel = raw.replace(/\s/g, "");
     if (tel) window.open(`tel:${tel}`, "_self");
   };
 
@@ -131,7 +159,7 @@ function GardeListContent() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
-              placeholder="Rechercher une pharmacie..."
+              placeholder="Nom ou adresse..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 rounded-xl bg-card border-primary/20"
@@ -161,6 +189,51 @@ function GardeListContent() {
           <p className="text-primary-foreground/90 text-xs mt-0.5">
             Zone : {zoneLabel}
           </p>
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <button
+              type="button"
+              onClick={() => { setWeekOffset(0); setCustomDate(null); }}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 0 && !customDate ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
+            >
+              Cette semaine
+            </button>
+            <button
+              type="button"
+              onClick={() => { setWeekOffset(1); setCustomDate(null); }}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${weekOffset === 1 && !customDate ? "bg-primary-foreground text-primary" : "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30"}`}
+            >
+              Semaine prochaine
+            </button>
+            <label className="flex items-center gap-1.5 text-primary-foreground/90 text-xs">
+              <span>Ou</span>
+              <input
+                type="date"
+                value={customDate ?? ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setCustomDate(v || null);
+                  if (v) setWeekOffset(0);
+                }}
+                className="rounded px-2 py-1 bg-primary-foreground/20 text-primary-foreground text-xs border-0 focus:ring-2 focus:ring-primary-foreground/50"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="text-muted-foreground text-xs">
+            {filtered.length} pharmacie{filtered.length !== 1 ? "s" : ""}
+          </span>
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+            <SelectTrigger className="w-auto min-w-[140px] h-8 rounded-lg bg-card border-primary/20 text-xs">
+              <SelectValue placeholder="Trier par" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Nom (A–Z)</SelectItem>
+              <SelectItem value="section">Section</SelectItem>
+              <SelectItem value="city">Ville</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {error && (
@@ -207,6 +280,22 @@ function GardeListContent() {
                       {p.address}
                     </p>
                   )}
+                  {p.phones && p.phones.length > 0 && (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      {p.phones.map((num) => (
+                        <span key={num} className="inline-flex items-center gap-1 rounded-md bg-muted/80 px-2 py-1 text-xs">
+                          <span className="text-muted-foreground">+225 {num}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); openTel(num); }}
+                            className="text-primary font-medium hover:underline"
+                          >
+                            Appeler
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-3 gap-2 px-4 pb-4">
                   <Button
@@ -214,7 +303,7 @@ function GardeListContent() {
                     className="min-w-0 gap-1 bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleAppeler(p);
+                      openTel(p.phones?.[0] ?? "");
                     }}
                   >
                     <Phone size={16} className="shrink-0" />

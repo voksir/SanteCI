@@ -25,8 +25,8 @@ export default function GardeDetail() {
 
   const currentPeriod = periods[0];
 
-  const handleAppeler = () => {
-    const tel = pharmacie?.phones?.[0]?.replace(/\s/g, "") ?? "";
+  const openTel = (raw: string) => {
+    const tel = raw.replace(/\s/g, "");
     if (tel) window.open(`tel:${tel}`, "_self");
   };
 
@@ -113,22 +113,32 @@ export default function GardeDetail() {
                   {pharmacie.section ?? ""} {pharmacie.area ?? pharmacie.city}
                 </p>
               )}
-              {pharmacie.phones?.length ? (
-                <a
-                  href={`tel:${pharmacie.phones[0].replace(/\s/g, "")}`}
-                  className="flex gap-2 text-primary font-medium text-sm mt-3"
-                >
-                  <Phone size={18} className="shrink-0" />
-                  +225 {pharmacie.phones[0]}
-                </a>
-              ) : null}
+              {pharmacie.phones && pharmacie.phones.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-muted-foreground text-xs font-medium">Téléphone(s)</p>
+                  {pharmacie.phones.map((num) => (
+                    <div key={num} className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-primary font-medium text-sm">+225 {num}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1 border-primary/40 text-primary shrink-0"
+                        onClick={() => openTel(num)}
+                      >
+                        <Phone size={14} />
+                        Appeler
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-2 mb-8">
               <Button
                 size="lg"
                 className="min-w-0 gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm sm:text-base"
-                onClick={handleAppeler}
+                onClick={() => pharmacie.phones?.[0] && openTel(pharmacie.phones[0])}
               >
                 <Phone size={20} className="shrink-0" />
                 <span className="truncate">Appeler</span>
