@@ -1,0 +1,10 @@
+# Mois suivant, sans référentiel
+python garde_abidjan.py \
+  --pdf garde-mars-2026.pdf \
+  --output-dir ./output
+
+# Avec référentiel du mois précédent (réutilise les pharmacy_key)
+python garde_abidjan.py \
+  --pdf garde-mars-2026.pdf \
+  --output-dir ./output \
+  --reference unppci_pharmacies_fevrier_2026.csv

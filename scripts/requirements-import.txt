@@ -1,0 +1,6 @@
+# Dépendances pour le script d'import CSV → Supabase
+# Usage: pip install -r scripts/requirements-import.txt
+
+pandas>=2.0.0
+supabase>=2.0.0
+python-dotenv>=1.0.0

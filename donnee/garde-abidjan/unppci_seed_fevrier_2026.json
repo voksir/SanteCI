@@ -1,0 +1,37 @@
+{
+  "source": {
+    "name": "UNPPCI",
+    "document": "Tour de garde Abidjan — fevrier 2026",
+    "pdf_file": "garde-fevrier-2026.pdf",
+    "generated_at": "2026-02-28T05:45:00Z"
+  },
+  "period": {
+    "month": "fevrier",
+    "year": 2026
+  },
+  "stats": {
+    "unique_pharmacies": 432,
+    "duty_entries": 458,
+    "weeks_covered": 4,
+    "weeks": [
+      [
+        "2026-02-07",
+        "2026-02-13"
+      ],
+      [
+        "2026-02-14",
+        "2026-02-20"
+      ],
+      [
+        "2026-02-21",
+        "2026-02-27"
+      ],
+      [
+        "2026-02-28",
+        "2026-03-06"
+      ]
+    ],
+    "reference_used": false,
+    "key_match_ratio": 0.0
+  }
+}

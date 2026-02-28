@@ -1,0 +1,8 @@
+# Sans référentiel
+python garde_interieur.py --pdf garde-interieur-mars-2026.pdf --output-dir ./output
+
+# Avec référentiel (réutilise les pharmacy_key)
+python garde_interieur.py \
+    --pdf garde-interieur-mars-2026.pdf \
+    --output-dir ./output \
+    --reference ./output/unppci_interieur_pharmacies_fevrier_2026.csv

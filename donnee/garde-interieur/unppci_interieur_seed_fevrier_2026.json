@@ -1,0 +1,106 @@
+{
+  "source": {
+    "name": "UNPPCI",
+    "document": "Tour de Garde Villes de l'Intérieur - Fevrier 2026",
+    "pdf_file": "garde-interieur-fevrier-2026.pdf",
+    "generated_at": "2026-02-28T06:06:41.244351"
+  },
+  "period": {
+    "month": "fevrier",
+    "month_num": 2,
+    "year": 2026
+  },
+  "stats": {
+    "unique_pharmacies": 283,
+    "duty_entries": 311,
+    "weeks_covered": 10,
+    "weeks": [
+      {
+        "start": "2026-01-31",
+        "end": "2026-02-07",
+        "count": 2
+      },
+      {
+        "start": "2026-02-07",
+        "end": "2026-02-13",
+        "count": 75
+      },
+      {
+        "start": "2026-02-07",
+        "end": "2026-02-14",
+        "count": 2
+      },
+      {
+        "start": "2026-02-14",
+        "end": "2026-02-20",
+        "count": 75
+      },
+      {
+        "start": "2026-02-14",
+        "end": "2026-02-21",
+        "count": 2
+      },
+      {
+        "start": "2026-02-21",
+        "end": "2026-02-27",
+        "count": 74
+      },
+      {
+        "start": "2026-02-21",
+        "end": "2026-02-28",
+        "count": 2
+      },
+      {
+        "start": "2026-02-23",
+        "end": "2026-03-01",
+        "count": 1
+      },
+      {
+        "start": "2026-02-28",
+        "end": "2026-03-06",
+        "count": 75
+      },
+      {
+        "start": "2026-02-28",
+        "end": "2026-03-07",
+        "count": 3
+      }
+    ],
+    "cities_distribution": {
+      "Bouake": 35,
+      "Yamoussoukro": 23,
+      "Daloa": 19,
+      "San Pedro": 19,
+      "Korhogo": 18,
+      "Divo": 17,
+      "Gagnoa": 17,
+      "Grand-Bassam": 13,
+      "Man": 12,
+      "Abengourou": 8,
+      "Dabou": 8,
+      "Soubre": 8,
+      "Adzope": 7,
+      "Duekoue": 7,
+      "Songon / Km 17": 7,
+      "Agboville": 6,
+      "Bondoukou": 6,
+      "Bouafle": 6,
+      "Issia": 5,
+      "Aboisso": 4,
+      "Agnibilekro": 4,
+      "Bonoua": 4,
+      "Danane": 4,
+      "Guiglo": 4,
+      "Odienne": 4,
+      "Sinfra": 4,
+      "Tiassale": 4,
+      "Adiake": 3,
+      "Diegonefla": 3,
+      "Bayota": 2,
+      "Azaguie": 1,
+      "Oume": 1
+    },
+    "reference_used": false,
+    "key_match_ratio": 0.0
+  }
+}
