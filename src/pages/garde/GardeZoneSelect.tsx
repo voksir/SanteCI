@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 
 /**
@@ -11,6 +12,21 @@ const GardeZoneSelect = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[hsl(120,20%,97%)]">
       <Header />
+      <header className="sticky top-14 z-40 bg-[hsl(120,20%,97%)] border-b border-border/50">
+        <div className="flex items-center gap-2 px-4 h-14">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="p-1 text-foreground"
+            aria-label="Retour à l'accueil"
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <h1 className="flex-1 text-foreground font-bold text-lg text-center pr-8">
+            Pharmacies de garde
+          </h1>
+        </div>
+      </header>
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-8">
         <p className="text-muted-foreground text-center text-base mb-8">
           Choisissez une zone.

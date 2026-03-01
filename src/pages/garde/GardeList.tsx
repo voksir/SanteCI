@@ -248,8 +248,16 @@ function GardeListContent() {
                     <h2 className="font-semibold text-foreground leading-tight">
                       {displayPharmacyName(p.name)}
                     </h2>
-                    <span className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-                      <span className="size-3 rounded-full bg-primary-foreground/80" />
+                    <span
+                      className={`shrink-0 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium ${
+                        weekOffset === 0
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-slate-200 text-slate-800 border border-slate-300"
+                      }`}
+                    >
+                      {weekOffset === 0 && (
+                        <span className="size-3 rounded-full bg-primary-foreground/80" />
+                      )}
                       De garde
                     </span>
                   </div>
