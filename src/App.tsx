@@ -8,7 +8,8 @@ import GardeZoneSelect from "./pages/garde/GardeZoneSelect";
 import GardeList from "./pages/garde/GardeList";
 import GardeDetail from "./pages/garde/GardeDetail";
 import Proximite from "./pages/Proximite";
-import Prix from "./pages/Prix";
+import PrixList from "./pages/prix/PrixList";
+import PrixDetail from "./pages/prix/PrixDetail";
 import Assurances from "./pages/Assurances";
 import Actualites from "./pages/Actualites";
 import Don from "./pages/Don";
@@ -29,7 +30,8 @@ const App = () => (
           <Route path="/garde/interieur" element={<GardeList />} />
           <Route path="/garde/pharmacie/:id" element={<GardeDetail />} />
           <Route path="/proximite" element={<Proximite />} />
-          <Route path="/prix" element={<Prix />} />
+          <Route path="/prix" element={<PrixList />} />
+          <Route path="/prix/medicament/:code" element={<PrixDetail />} />
           <Route path="/assurances" element={<Assurances />} />
           <Route path="/actualites" element={<Actualites />} />
           <Route path="/don" element={<Don />} />

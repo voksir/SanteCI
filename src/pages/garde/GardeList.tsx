@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, MapPin, ChevronRight, Share2 } from "lucide-react";
+import { ArrowLeft, MapPin, ChevronRight, Share2 } from "lucide-react";
 import {
   getGardeAbidjan,
   getGardeInterieur,
@@ -9,6 +9,10 @@ import {
   getVillesInterieur,
 } from "@/services/gardeApi";
 import type { PharmacieDeGarde } from "@/types/garde";
+import { useFuzzySearch, pharmacySearchKeys, THRESHOLDS } from "@/lib/fuzzy";
+import { SearchInput } from "@/components/search/SearchInput";
+import { SearchHighlight } from "@/components/search/SearchHighlight";
+import { FuzzySearchBadge } from "@/components/search/FuzzySearchBadge";
 import { startOfWeek, endOfWeek, format, addWeeks } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
@@ -19,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 function getWeekRange(weekOffset: number): { start: string; end: string } {
@@ -37,10 +40,6 @@ function formatDateRange(start: string, end: string) {
 }
 
 const PHCIE_PREFIX = "PHCIE ";
-
-function displayPharmacyName(name: string) {
-  return name ? `${PHCIE_PREFIX}${name}` : PHCIE_PREFIX.trim();
-}
 
 type SortOption = "name" | "section" | "city";
 
@@ -77,27 +76,32 @@ function GardeListContent() {
     enabled: !isAbidjan,
   });
 
-  const filtered = useMemo(() => {
-    let result = list;
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
-      result = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          (p.address?.toLowerCase().includes(q)) ||
-          (p.section?.toLowerCase().includes(q)) ||
-          (p.area?.toLowerCase().includes(q)) ||
-          (p.city?.toLowerCase().includes(q))
-      );
-    }
-    const sorted = [...result].sort((a, b) => {
-      if (sortBy === "name") return (a.name ?? "").localeCompare(b.name ?? "");
-      if (sortBy === "section") return (a.section ?? "").localeCompare(b.section ?? "");
-      if (sortBy === "city") return (a.city ?? "").localeCompare(b.city ?? "");
-      return 0;
-    });
-    return sorted;
-  }, [list, search, sortBy]);
+  const {
+    results: fuzzyFiltered,
+    fuzzyResults,
+    isSearching,
+    isFuzzyMode,
+  } = useFuzzySearch(list, search, pharmacySearchKeys, {
+    threshold: THRESHOLDS.pharmacy,
+    debounceMs: 200,
+    minChars: 2,
+  });
+
+  const filtered = useMemo(
+    () =>
+      [...fuzzyFiltered].sort((a, b) => {
+        if (sortBy === "name") return (a.name ?? "").localeCompare(b.name ?? "");
+        if (sortBy === "section") return (a.section ?? "").localeCompare(b.section ?? "");
+        if (sortBy === "city") return (a.city ?? "").localeCompare(b.city ?? "");
+        return 0;
+      }),
+    [fuzzyFiltered, sortBy]
+  );
+
+  const matchById = useMemo(
+    () => new Map(fuzzyResults.map((r) => [r.item.id, r])),
+    [fuzzyResults]
+  );
 
   const handleYAller = (p: PharmacieDeGarde) => {
     const query = [p.name, p.address, p.area ?? p.city].filter(Boolean).join(", ");
@@ -150,15 +154,13 @@ function GardeListContent() {
           </Button>
         </div>
         <div className="px-4 pb-3 space-y-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              placeholder="Nom ou adresse..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 rounded-xl bg-card border-primary/20"
-            />
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Nom ou adresse..."
+            isSearching={isSearching}
+          />
+          <FuzzySearchBadge visible={isFuzzyMode} className="mt-1" />
           <Select value={filterValue ?? "all"} onValueChange={(v) => setFilter(v === "all" ? null : v)}>
             <SelectTrigger className="w-full rounded-xl bg-card border-primary/20">
               <SelectValue placeholder={filterLabel} />
@@ -234,7 +236,9 @@ function GardeListContent() {
         )}
         {!isLoading && !error && filtered.length > 0 && (
           <ul className="space-y-3">
-            {filtered.map((p) => (
+            {filtered.map((p) => {
+              const meta = matchById.get(p.id);
+              return (
               <li
                 key={p.id}
                 className="rounded-xl bg-card border border-primary/20 shadow-sm overflow-hidden"
@@ -246,7 +250,12 @@ function GardeListContent() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h2 className="font-semibold text-foreground leading-tight">
-                      {displayPharmacyName(p.name)}
+                      {PHCIE_PREFIX}
+                      <SearchHighlight
+                        text={p.name ?? ""}
+                        fieldKey="name"
+                        matches={meta?.matches}
+                      />
                     </h2>
                     <span
                       className={`shrink-0 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium ${
@@ -308,7 +317,8 @@ function GardeListContent() {
                   </Button>
                 </div>
               </li>
-            ))}
+            );
+            })}
           </ul>
         )}
       </main>

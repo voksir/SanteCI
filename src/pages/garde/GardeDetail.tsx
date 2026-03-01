@@ -178,7 +178,7 @@ export default function GardeDetail() {
                 <CollapsibleTrigger asChild>
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between rounded-xl border border-primary/20 bg-card px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                    className="flex w-full items-center justify-between rounded-xl border-2 border-primary/25 bg-white shadow-sm px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-primary/5 transition-colors"
                   >
                     <span>Autres périodes de garde ({otherPeriods.length})</span>
                     {autresPeriodesOpen ? (
@@ -189,7 +189,7 @@ export default function GardeDetail() {
                   </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <ul className="mt-2 space-y-2 rounded-xl border border-primary/20 bg-muted/30 p-4">
+                  <ul className="mt-2 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
                     {otherPeriods.map((p) => (
                       <li
                         key={p.id}
@@ -203,7 +203,7 @@ export default function GardeDetail() {
               </Collapsible>
             )}
 
-            <div className="rounded-2xl bg-card border border-primary/20 shadow-sm p-5 mb-4">
+            <div className="rounded-2xl bg-white border-2 border-primary/25 shadow-md p-5 mb-4">
               <h2 className={`font-bold text-lg text-foreground ${zoneLabel ? "mb-1" : "mb-4"}`}>
                 PHCIE {pharmacie.name}
               </h2>
@@ -245,7 +245,7 @@ export default function GardeDetail() {
             </div>
 
             {pharmacie.phones && pharmacie.phones.length > 2 && (
-              <div className="rounded-2xl bg-muted/40 border border-border/60 shadow-sm p-5 mb-6">
+              <div className="rounded-2xl bg-white border-2 border-primary/25 shadow-md p-5 mb-6">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide mb-3">
                   Téléphone(s)
                 </p>
@@ -280,7 +280,7 @@ export default function GardeDetail() {
               <Button
                 size="lg"
                 variant="outline"
-                className="min-w-0 gap-1.5 border-primary/40 text-primary text-sm sm:text-base"
+                className="min-w-0 gap-1.5 border-2 border-primary/50 bg-white text-primary text-sm sm:text-base hover:bg-primary/5"
                 onClick={handleYAller}
               >
                 <MapPin size={20} className="shrink-0" />
@@ -289,7 +289,7 @@ export default function GardeDetail() {
               <Button
                 size="lg"
                 variant="outline"
-                className="min-w-0 gap-1.5 border-primary/40 text-primary text-sm sm:text-base"
+                className="min-w-0 gap-1.5 border-2 border-primary/50 bg-white text-primary text-sm sm:text-base hover:bg-primary/5"
                 onClick={handlePartager}
               >
                 <Share2 size={20} className="shrink-0" />
@@ -297,11 +297,11 @@ export default function GardeDetail() {
               </Button>
             </div>
 
-            <div className="rounded-xl bg-muted/60 border border-border/50 p-4 flex gap-3">
-              <span className="text-muted-foreground shrink-0 size-5 rounded-full border border-muted-foreground/50 flex items-center justify-center text-xs font-medium">
+            <div className="rounded-xl bg-slate-100 border border-slate-300 p-4 flex gap-3">
+              <span className="text-slate-600 shrink-0 size-5 rounded-full border border-slate-400 flex items-center justify-center text-xs font-medium">
                 i
               </span>
-              <p className="text-muted-foreground text-xs leading-relaxed">
+              <p className="text-slate-700 text-xs leading-relaxed">
                 Les données sont fournies à titre informatif uniquement. Veuillez
                 vérifier directement auprès de la pharmacie. Source : UNPPCI —
                 Tour de garde.
