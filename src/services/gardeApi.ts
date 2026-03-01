@@ -164,3 +164,23 @@ export async function getDutyPeriodsByPharmacieId(
   if (error) throw error;
   return (data as DutyPeriodRow[]).map(rowToPharmacieDeGarde);
 }
+
+/**
+ * Dernière période de garde connue pour une pharmacie (y compris passée).
+ * Utilisé pour afficher "Dernière période : du ... au ..." quand il n'y a pas de période à venir.
+ */
+export async function getLastDutyPeriodByPharmacieId(
+  pharmacyId: string
+): Promise<PharmacieDeGarde | null> {
+  const { data, error } = await supabase
+    .from("duty_periods")
+    .select("*, pharmacies(*)")
+    .eq("pharmacy_id", pharmacyId)
+    .order("end_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+  return rowToPharmacieDeGarde(data as DutyPeriodRow);
+}

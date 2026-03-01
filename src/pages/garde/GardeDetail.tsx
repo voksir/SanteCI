@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, Phone, Share2, ChevronDown, ChevronUp } from "lucide-react";
-import { getPharmacieById, getDutyPeriodsByPharmacieId } from "@/services/gardeApi";
+import {
+  getPharmacieById,
+  getDutyPeriodsByPharmacieId,
+  getLastDutyPeriodByPharmacieId,
+} from "@/services/gardeApi";
 import { format, isWithinInterval } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
@@ -21,6 +25,12 @@ function formatPeriodAriaLabel(startDate: string, endDate: string): string {
   return `De garde du ${start} au ${end}`;
 }
 
+function formatLastPeriodLabel(startDate: string, endDate: string): string {
+  const start = format(new Date(startDate), "d MMM", { locale: fr });
+  const end = format(new Date(endDate), "d MMM yyyy", { locale: fr });
+  return `Dernière période de garde : du ${start} au ${end} – Pas de garde`;
+}
+
 export default function GardeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -32,10 +42,16 @@ export default function GardeDetail() {
     enabled: !!id,
   });
 
-  const { data: periods = [] } = useQuery({
+  const { data: periods = [], isFetched: periodsFetched } = useQuery({
     queryKey: ["garde", "pharmacie", id],
     queryFn: () => getDutyPeriodsByPharmacieId(id!),
     enabled: !!id,
+  });
+
+  const { data: lastPeriod } = useQuery({
+    queryKey: ["garde", "pharmacie", id, "last-period"],
+    queryFn: () => getLastDutyPeriodByPharmacieId(id!),
+    enabled: !!id && periodsFetched && periods.length === 0,
   });
 
   const currentPeriod = periods[0];
@@ -124,7 +140,8 @@ export default function GardeDetail() {
         )}
         {!isLoading && !error && pharmacie && (
           <>
-            {currentPeriod && (
+            {/* Bannière période : verte si en cours/à venir, secondaire si dernière période ou pas de garde */}
+            {currentPeriod ? (
               <div
                 className="rounded-xl bg-primary px-4 py-3 text-primary-foreground text-sm font-medium flex flex-wrap items-center gap-2 mb-4"
                 role="status"
@@ -139,6 +156,20 @@ export default function GardeDetail() {
                     En ce moment
                   </span>
                 )}
+              </div>
+            ) : lastPeriod ? (
+              <div
+                className="rounded-xl bg-slate-200 text-slate-800 border border-slate-300 px-4 py-3 text-sm font-medium mb-4"
+                role="status"
+              >
+                {formatLastPeriodLabel(lastPeriod.start_date, lastPeriod.end_date)}
+              </div>
+            ) : (
+              <div
+                className="rounded-xl bg-slate-200 text-slate-800 border border-slate-300 px-4 py-3 text-sm font-medium mb-4"
+                role="status"
+              >
+                Pas de garde
               </div>
             )}
 
