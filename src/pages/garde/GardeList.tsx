@@ -157,7 +157,7 @@ function GardeListContent() {
           <SearchInput
             value={search}
             onChange={setSearch}
-            placeholder="Nom ou adresse..."
+            placeholder="Nom, quartier, commune ou ville..."
             isSearching={isSearching}
           />
           <FuzzySearchBadge visible={isFuzzyMode} className="mt-1" />
